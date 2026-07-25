@@ -1,5 +1,7 @@
 # OpenGrantIndex
 
+live Demo: https://ogi.shakespeare.wtf
+
 [![Edit with Shakespeare](https://shakespeare.diy/badge.svg)](https://shakespeare.diy/clone?url=https%3A%2F%2Fgithub.com%2FNostrDanish%2FOpengrantindex.git)
 
 An open-source, decentralized search engine for grants, fellowships, bounties, RFPs, prizes,
