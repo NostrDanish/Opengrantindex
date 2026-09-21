@@ -21,7 +21,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 
 import { CommentsSection } from '@/components/comments/CommentsSection';
 import { AttestationPanel } from '@/components/ogi/AttestationPanel';
-import { DeadlinePill, StatusBadge, TrustBadge, TypeBadge } from '@/components/ogi/badges';
+import { StatusBadge, TrustBadge, TypeBadge } from '@/components/ogi/badges';
 import { Layout } from '@/components/ogi/Layout';
 import { OpportunityCard } from '@/components/ogi/OpportunityCard';
 import { RecordProvenance } from '@/components/ogi/RecordProvenance';

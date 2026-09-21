@@ -28,6 +28,7 @@ export default function SavedPage() {
   const { data: searches = [], isLoading: searchesLoading } = useSavedSearches();
 
   const opportunities = useMemo(() => {
+    // eslint-disable-next-line react-hooks/purity -- memoized point-in-time snapshot for deadline filtering
     const now = Math.floor(Date.now() / 1000);
     return index.opportunities
       .filter((o) => saved.has(o.address) || o.mirrors.some((m) => saved.has(m.address)))

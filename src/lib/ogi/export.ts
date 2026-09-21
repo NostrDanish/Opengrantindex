@@ -28,7 +28,7 @@ export function buildRssFeed(
   const items = opportunities
     .slice(0, 100)
     .map((o) => {
-      const link = `${options.origin}${canonicalUrlToPath(o)}`;
+      const link = `${options.origin}${canonicalUrlToPath(o.canonicalUrl)}`;
       const { status } = effectiveStatus(o);
       const parts = [
         o.summary ?? o.description.slice(0, 400),
@@ -87,7 +87,7 @@ export function buildIcsFeed(opportunities: MergedOpportunity[], origin: string)
         `DTEND:${icsDate(end)}`,
         `SUMMARY:${icsEscape(`Deadline: ${o.title}`)}`,
         `DESCRIPTION:${icsEscape(
-          [o.summary ?? '', o.funderName ? `Funder: ${o.funderName}` : '', `${origin}${canonicalUrlToPath(o)}`]
+          [o.summary ?? '', o.funderName ? `Funder: ${o.funderName}` : '', `${origin}${canonicalUrlToPath(o.canonicalUrl)}`]
             .filter(Boolean)
             .join('\n'),
         )}`,

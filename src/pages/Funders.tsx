@@ -39,6 +39,7 @@ export default function FundersPage() {
   const [type, setType] = useState<FunderType | 'all'>('all');
 
   const rows = useMemo(() => {
+    // eslint-disable-next-line react-hooks/purity -- memoized point-in-time snapshot for deadline filtering
     const now = Math.floor(Date.now() / 1000);
 
     const openByFunder = new Map<string, number>();

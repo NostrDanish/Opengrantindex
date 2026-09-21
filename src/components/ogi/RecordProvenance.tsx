@@ -93,7 +93,7 @@ function MirrorRow({ mirror, winning }: { mirror: Opportunity; winning: boolean 
   const isSnapshot = mirror.pubkey === SNAPSHOT_PUBKEY;
   const author = useAuthor(isSnapshot ? undefined : mirror.pubkey);
   const metadata = author.data?.metadata;
-  const name = isSnapshot ? 'Bundled snapshot' : getDisplayName(mirror.pubkey, metadata);
+  const name = isSnapshot ? 'Bundled snapshot' : getDisplayName(metadata, mirror.pubkey);
   const naddr = isSnapshot ? undefined : naddrOf({ kind: OGI_KINDS.OPPORTUNITY, pubkey: mirror.pubkey }, mirror.identifier);
 
   return (

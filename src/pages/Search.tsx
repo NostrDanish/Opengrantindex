@@ -1,6 +1,6 @@
 import { useSeoMeta } from '@unhead/react';
 import { Bell, CalendarDays, Download, FileJson, Loader2, RefreshCw, Rss, SlidersHorizontal } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { ActiveFilterChips, FilterPanel } from '@/components/ogi/FilterPanel';
@@ -38,9 +38,13 @@ export default function SearchPage() {
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  useEffect(() => {
+  // Reset pagination whenever the filters change (render-time adjust, the
+  // sanctioned alternative to a setState-in-effect sync).
+  const [prevFilters, setPrevFilters] = useState(filters);
+  if (prevFilters !== filters) {
+    setPrevFilters(filters);
     setVisible(PAGE_SIZE);
-  }, [filters]);
+  }
 
   const title = filters.q
     ? `${filters.q} — OpenGrantIndex`

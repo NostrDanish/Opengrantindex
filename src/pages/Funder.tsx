@@ -28,6 +28,7 @@ export default function FunderPage() {
 
   const opportunities = useMemo(() => {
     if (!funder) return [];
+    // eslint-disable-next-line react-hooks/purity -- memoized point-in-time snapshot for deadline filtering
     const now = Math.floor(Date.now() / 1000);
     return index.opportunities
       .filter((o) => o.funderAddress === funder.address || o.funderName === funder.name)

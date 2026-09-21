@@ -65,7 +65,7 @@ export function useOgiIndex() {
     queryFn: async (c) => {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(QUERY_TIMEOUT)]);
 
-      let events: Awaited<ReturnType<typeof nostr.query>> = [];
+      let events: Awaited<ReturnType<typeof nostr.query>>;
       try {
         events = await nostr.query(
           [

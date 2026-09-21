@@ -201,7 +201,7 @@ export function AttestationPanel({ opportunity }: { opportunity: MergedOpportuni
 function AttestationRow({ attestation }: { attestation: Attestation }) {
   const author = useAuthor(attestation.pubkey);
   const metadata = author.data?.metadata;
-  const name = getDisplayName(attestation.pubkey, metadata);
+  const name = getDisplayName(metadata, attestation.pubkey);
   const Icon = VERDICT_ICONS[attestation.verdict];
 
   return (

@@ -16,7 +16,8 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { Layout } from '@/components/ogi/Layout';
 import { OpportunityCard, OpportunityCardSkeleton } from '@/components/ogi/OpportunityCard';
-import { EXAMPLE_QUERIES, SearchBar } from '@/components/ogi/SearchBar';
+import { EXAMPLE_QUERIES } from '@/components/ogi/exampleQueries';
+import { SearchBar } from '@/components/ogi/SearchBar';
 import { Button } from '@/components/ui/button';
 import { useOgiIndex } from '@/hooks/useOgiIndex';
 import { formatAmount } from '@/lib/ogi/format';
@@ -38,6 +39,7 @@ export default function Home() {
   const { index, isSyncing } = useOgiIndex();
 
   const stats = useMemo(() => {
+    // eslint-disable-next-line react-hooks/purity -- memoized point-in-time snapshot for deadline filtering
     const now = Math.floor(Date.now() / 1000);
     let open = 0;
     let totalUsd = 0;
@@ -65,6 +67,7 @@ export default function Home() {
   }, [index]);
 
   const closingSoon = useMemo(() => {
+    // eslint-disable-next-line react-hooks/purity -- memoized point-in-time snapshot for deadline filtering
     const now = Math.floor(Date.now() / 1000);
     return index.opportunities
       .filter((o) => o.deadline && o.deadline > now && effectiveStatus(o, now).status === 'open')

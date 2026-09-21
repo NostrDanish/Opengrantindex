@@ -1,17 +1,9 @@
 import { Search, Sparkles, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-
-export const EXAMPLE_QUERIES = [
-  'open source privacy grants in Europe over €25k',
-  'AI safety fellowships closing in 30 days',
-  'bounties for nostr developers, remote',
-  'climate research funding for universities in the UK',
-  'rolling grants with no deadline under $50k',
-];
 
 export function SearchBar({
   value,
@@ -31,7 +23,13 @@ export function SearchBar({
   const [draft, setDraft] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => setDraft(value), [value]);
+  // Reset the draft when the parent changes the query (render-time adjust,
+  // the sanctioned alternative to a setState-in-effect sync).
+  const [prevValue, setPrevValue] = useState(value);
+  if (prevValue !== value) {
+    setPrevValue(value);
+    setDraft(value);
+  }
 
   const large = size === 'large';
 
