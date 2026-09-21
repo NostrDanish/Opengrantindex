@@ -23,6 +23,28 @@ export interface SeedAward {
   source: 'irs-990' | 'funder-report' | 'press-release' | 'community';
 }
 
+/**
+ * An award produced by the automated crawler (e.g. the NIH RePORTER adapter).
+ * Mirrors SeedAward; `lastChecked` is crawler bookkeeping (unix seconds) and
+ * is not materialized into the award event.
+ */
+export interface GeneratedAward {
+  sourceId: string;
+  funder: { name: string; id: string };
+  recipient: string;
+  purpose: string;
+  amount?: { value: number; currency: string };
+  year: string;
+  topics: string[];
+  countries: string[];
+  projectUrl?: string;
+  source: string;
+  /** Stable per-source record key (e.g. NIH project number) folded into the identifier. */
+  recordKey?: string;
+  /** Unix seconds: when the crawler last saw this record at the source. */
+  lastChecked: number;
+}
+
 export const SEED_AWARDS: SeedAward[] = [
   // --- Open source / privacy in Europe -------------------------------------
   {

@@ -15,6 +15,9 @@ concurrency:
 
 env:
   OGI_BOT_NSEC: ${{ secrets.OGI_BOT_NSEC }}
+  # Auto-injected per-run token; lifts the GitHub Search API rate limit for
+  # the github-bounties adapter (works unauthenticated too, just tighter).
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   crawl:

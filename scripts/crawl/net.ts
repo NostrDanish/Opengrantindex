@@ -28,8 +28,11 @@ async function throttle(url: string): Promise<void> {
 
 export interface FetchTextOptions {
   method?: 'GET' | 'POST';
+  /** JSON-serialized unless a FormData instance (multipart, e.g. EU SEDIA). */
   body?: unknown;
   headers?: Record<string, string>;
+  /** Override the default 20s timeout (slow APIs like SEDIA deep pages). */
+  timeoutMs?: number;
 }
 
 /** Fetch a URL as text with crawler etiquette. Throws on HTTP errors. */
@@ -40,8 +43,10 @@ export async function fetchText(url: string, options: FetchTextOptions = {}): Pr
     accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, application/json, text/html;q=0.8, */*;q=0.5',
     ...options.headers,
   };
-  let body: string | undefined;
-  if (options.body !== undefined) {
+  let body: string | FormData | undefined;
+  if (options.body instanceof FormData) {
+    body = options.body;
+  } else if (options.body !== undefined) {
     body = JSON.stringify(options.body);
     headers['content-type'] = 'application/json';
   }
@@ -49,7 +54,7 @@ export async function fetchText(url: string, options: FetchTextOptions = {}): Pr
     method: options.method ?? 'GET',
     headers,
     body,
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    signal: AbortSignal.timeout(options.timeoutMs ?? FETCH_TIMEOUT_MS),
     redirect: 'follow',
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);

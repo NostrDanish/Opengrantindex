@@ -1,5 +1,7 @@
 import type { FundingType, OpportunityStatus } from '../types';
 
+import type { GeneratedAward } from './awards';
+
 /**
  * Bundled snapshot of the index.
  *
@@ -71,6 +73,8 @@ export interface GeneratedOpportunity {
 export interface GeneratedSnapshot {
   generatedAt: number;
   opportunities: GeneratedOpportunity[];
+  /** Historical awards (kind 34011 records) from award-capable adapters. */
+  awards?: GeneratedAward[];
 }
 
 /** Per-source outcome of one crawler run. */

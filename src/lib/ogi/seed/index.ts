@@ -193,6 +193,47 @@ function generatedTagInput(o: GeneratedOpportunity): OpportunityTagInput {
   return { ...o, publishedAt: o.publishedAt ?? o.lastChecked };
 }
 
+/** Input shape shared by seed and generated awards for tag building. */
+interface AwardTagInput {
+  sourceId: string;
+  funder: { name: string; id: string };
+  recipient: string;
+  amount?: { value: number; currency: string };
+  year: string;
+  topics: string[];
+  countries: string[];
+  projectUrl?: string;
+  source: string;
+  /** Stable per-source record key folded into the identifier (generated awards). */
+  recordKey?: string;
+}
+
+/** Award identifier: deterministic over the identity facts of the award. */
+export function awardIdentifier(a: AwardTagInput, recordKey?: string): string {
+  return `${a.sourceId}:${shortHash(
+    `${a.funder.id}|${a.recipient}|${a.year}|${a.amount?.value ?? ''}${recordKey ? `|${recordKey}` : ''}`,
+  )}`;
+}
+
+/** Build the event tags for a kind 34011 award (shared by seed + generated). */
+function awardTags(a: AwardTagInput, identifier: string): string[][] {
+  const tags: string[][] = [
+    ['d', identifier],
+    ['funder', a.funder.name, `${OGI_KINDS.FUNDER}:${SNAPSHOT_PUBKEY}:${a.funder.id}`],
+    ['recipient', a.recipient],
+    ['year', a.year],
+    ['source', a.source],
+    ...a.topics.map((t) => ['t', t]),
+    ...labelTags('ISO-3166-1', a.countries),
+    ['alt', `Grant award: ${a.funder.name} → ${a.recipient}`],
+  ];
+  if (a.amount) tags.push(['amount', String(a.amount.value), String(a.amount.value), a.amount.currency]);
+  if (a.projectUrl) tags.push(['r', a.projectUrl, 'project']);
+  const awardedAt = Date.UTC(Number(a.year), 5, 15) / 1000;
+  if (Number.isFinite(awardedAt)) tags.push(['awarded_at', String(Math.floor(awardedAt))]);
+  return tags;
+}
+
 /**
  * Materialise the bundled snapshot into parsed domain objects.
  *
@@ -202,8 +243,6 @@ function generatedTagInput(o: GeneratedOpportunity): OpportunityTagInput {
 export function getSnapshot() {
   const now = Math.floor(Date.now() / 1000);
   if (cache && now - cache.builtAt < 3600) return cache;
-
-  const funderAddress = (id: string) => `${OGI_KINDS.FUNDER}:${SNAPSHOT_PUBKEY}:${id}`;
 
   /* ---------------------------------------------------------------- sources */
   const reportById = new Map((CRAWL_REPORT?.sources ?? []).map((r) => [r.id, r]));
@@ -293,25 +332,21 @@ export function getSnapshot() {
   }
 
   /* ----------------------------------------------------------------- awards */
-  const awards: Award[] = [];
+  // Merge hand-written seeds with crawler-generated awards, deduped by the
+  // deterministic award identifier; generated records win on collision.
+  const awardInputs = new Map<string, { input: AwardTagInput; purpose: string }>();
   for (const a of SEED_AWARDS) {
-    const identifier = `${a.sourceId}:${shortHash(`${a.funder.id}|${a.recipient}|${a.year}|${a.amount.value}`)}`;
-    const tags: string[][] = [
-      ['d', identifier],
-      ['funder', a.funder.name, funderAddress(a.funder.id)],
-      ['recipient', a.recipient],
-      ['amount', String(a.amount.value), String(a.amount.value), a.amount.currency],
-      ['year', a.year],
-      ['source', a.source],
-      ...a.topics.map((t) => ['t', t]),
-      ...labelTags('ISO-3166-1', a.countries),
-      ['alt', `Grant award: ${a.funder.name} → ${a.recipient}`],
-    ];
-    if (a.projectUrl) tags.push(['r', a.projectUrl, 'project']);
-    const awardedAt = Date.UTC(Number(a.year), 5, 15) / 1000;
-    if (Number.isFinite(awardedAt)) tags.push(['awarded_at', String(Math.floor(awardedAt))]);
+    awardInputs.set(awardIdentifier(a), { input: a, purpose: a.purpose });
+  }
+  for (const a of GENERATED_SNAPSHOT.awards ?? []) {
+    awardInputs.set(awardIdentifier(a, a.recordKey), { input: a, purpose: a.purpose });
+  }
 
-    const parsed = parseAward(unsigned(OGI_KINDS.AWARD, a.purpose, tags, now - 60 * DAY));
+  const awards: Award[] = [];
+  for (const { input, purpose } of awardInputs.values()) {
+    const parsed = parseAward(
+      unsigned(OGI_KINDS.AWARD, purpose, awardTags(input, awardIdentifier(input, input.recordKey)), now - 60 * DAY),
+    );
     if (parsed) awards.push(parsed);
   }
 

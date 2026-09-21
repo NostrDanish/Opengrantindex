@@ -24,15 +24,21 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { canonicalizeUrl, detectDeadline, shortHash, slugify } from '../../src/lib/ogi/normalize';
+import type { GeneratedAward } from '../../src/lib/ogi/seed/awards';
+import { awardIdentifier } from '../../src/lib/ogi/seed/index';
 import type { GeneratedOpportunity, GeneratedSnapshot, CrawlReport } from '../../src/lib/ogi/seed/opportunities';
 import { SEED_SOURCES } from '../../src/lib/ogi/seed/sources';
 import type { SeedSource } from '../../src/lib/ogi/seed/sources';
 import type { FundingType, OpportunityStatus } from '../../src/lib/ogi/types';
 
+import { crawlEuSedia } from './adapters/euSedia';
+import { crawlGithubBounties } from './adapters/githubBounties';
 import { crawlGrantsGov } from './adapters/grantsGov';
+import { crawlManifund } from './adapters/manifund';
+import { crawlNihReporter } from './adapters/nihReporter';
 import { crawlRss } from './adapters/rss';
 import { publishOpportunities } from './publish';
-import type { AdapterResult, RawCandidate } from './types';
+import type { AdapterResult, RawAward, RawCandidate } from './types';
 
 const DAY = 86_400;
 /** Records not seen at their source for longer than this are marked closed. */
@@ -95,7 +101,7 @@ function normalizeCandidate(source: SeedSource, c: RawCandidate, now: number): G
   const haystack = `${title}\n${description}`;
 
   const deadline = c.deadline ?? detectDeadline(haystack);
-  const funder = source.funder ?? { name: source.name, id: slugify(source.name) || source.id };
+  const funder = c.funder ?? source.funder ?? { name: source.name, id: slugify(source.name) || source.id };
 
   return {
     sourceId: source.id,
@@ -121,12 +127,42 @@ function normalizeCandidate(source: SeedSource, c: RawCandidate, now: number): G
   };
 }
 
+/** Normalize a raw award into its snapshot record (absolute fields). */
+function normalizeAward(source: SeedSource, a: RawAward, now: number): GeneratedAward {
+  const funder = source.funder ?? { name: source.name, id: slugify(source.name) || source.id };
+  return {
+    sourceId: source.id,
+    funder,
+    recipient: a.recipient.replace(/\s+/g, ' ').trim().slice(0, 300),
+    purpose: a.purpose.trim().slice(0, 4000),
+    amount: a.amount,
+    year: a.year,
+    topics: source.topics,
+    countries: source.countries,
+    projectUrl: a.projectUrl,
+    source: 'funder-report',
+    recordKey: a.recordKey,
+    lastChecked: now,
+  };
+}
+
 /* ---------------------------------------------------------------- adapters */
 
 const UNSUPPORTED_KINDS = new Set(['html', 'sitemap', 'graphql', 'pdf', 'json-ld']);
 
 async function runAdapter(source: SeedSource): Promise<AdapterResult | { skipped: string }> {
-  if (source.id === 'grants-gov') return crawlGrantsGov();
+  switch (source.id) {
+    case 'grants-gov':
+      return crawlGrantsGov();
+    case 'eu-horizon':
+      return crawlEuSedia();
+    case 'github-bounties':
+      return crawlGithubBounties();
+    case 'manifund':
+      return crawlManifund();
+    case 'nih-reporter':
+      return crawlNihReporter();
+  }
 
   const rssEndpoints = source.endpoints.filter((e) => e.kind === 'rss');
   if (rssEndpoints.length) return crawlRss(rssEndpoints);
@@ -175,6 +211,10 @@ async function main(): Promise<void> {
     const canonical = canonicalizeUrl(o.url);
     if (canonical) prevByCanonical.set(canonical, o);
   }
+  const prevAwardByIdentifier = new Map<string, GeneratedAward>();
+  for (const a of previous.awards ?? []) {
+    prevAwardByIdentifier.set(awardIdentifier(a, a.recordKey), a);
+  }
 
   const sources = onlySource ? SEED_SOURCES.filter((s) => s.id === onlySource) : SEED_SOURCES;
   if (onlySource && !sources.length) {
@@ -185,6 +225,7 @@ async function main(): Promise<void> {
 
   const report: CrawlReport = { ranAt: now, sources: [] };
   const fresh = new Map<string, GeneratedOpportunity>(); // canonical → record, this run
+  const freshAwards = new Map<string, GeneratedAward>(); // identifier → award, this run
   const crawledOk = new Set<string>();
 
   for (const source of sources) {
@@ -218,13 +259,30 @@ async function main(): Promise<void> {
       }
       crawledOk.add(source.id);
 
+      // Awards (kind 34011 records) from award-capable adapters, deduped by
+      // the deterministic award identifier.
+      const awards: GeneratedAward[] = [];
+      for (const raw of result.awards ?? []) {
+        const award = normalizeAward(source, raw, now);
+        const key = awardIdentifier(award, award.recordKey);
+        if (freshAwards.has(key)) continue;
+        freshAwards.set(key, award);
+        awards.push(award);
+      }
+      const newAwardCount = awards.filter(
+        (a) => !prevAwardByIdentifier.has(awardIdentifier(a, a.recordKey)),
+      ).length;
+
       const newCount = records.filter((r) => !prevByCanonical.has(canonicalizeUrl(r.url) ?? '')).length;
-      console.log(`[${source.id}] ok: ${records.length} opportunities (${newCount} new)`);
+      console.log(
+        `[${source.id}] ok: ${records.length} opportunities (${newCount} new)` +
+          (awards.length ? `, ${awards.length} awards (${newAwardCount} new)` : ''),
+      );
       report.sources.push({
         id: source.id,
         status: 'ok',
-        items: records.length,
-        new: newCount,
+        items: records.length + awards.length,
+        new: newCount + newAwardCount,
         errors: result.errors,
         durationMs: Date.now() - start,
       });
@@ -262,7 +320,27 @@ async function main(): Promise<void> {
     merged.set(canonical, { ...record, publishedAt: prev?.publishedAt ?? record.publishedAt ?? record.lastChecked });
   }
 
-  const snapshot: GeneratedSnapshot = { generatedAt: now, opportunities: [...merged.values()] };
+  /* Awards merge: keep everything, refresh lastChecked on re-sighting.
+   * Awards are historical facts — they never close or expire. Capped so a
+   * sampling adapter (NIH) can't grow the bundle without bound. */
+  const MAX_AWARDS_KEPT = 1000;
+  const mergedAwards = new Map<string, GeneratedAward>();
+  for (const [key, prev] of prevAwardByIdentifier) {
+    if (!freshAwards.has(key)) mergedAwards.set(key, prev);
+  }
+  for (const [key, award] of freshAwards) mergedAwards.set(key, award);
+  let awardsKept = [...mergedAwards.values()];
+  if (awardsKept.length > MAX_AWARDS_KEPT) {
+    awardsKept = awardsKept
+      .sort((a, b) => b.lastChecked - a.lastChecked)
+      .slice(0, MAX_AWARDS_KEPT);
+  }
+
+  const snapshot: GeneratedSnapshot = {
+    generatedAt: now,
+    opportunities: [...merged.values()],
+    awards: awardsKept,
+  };
 
   const totals = {
     sources: report.sources.length,
@@ -270,11 +348,12 @@ async function main(): Promise<void> {
     errors: report.sources.filter((s) => s.status === 'error').length,
     skipped: report.sources.filter((s) => s.status === 'skipped').length,
     opportunities: snapshot.opportunities.length,
-    fresh: fresh.size,
+    awards: awardsKept.length,
+    fresh: fresh.size + freshAwards.size,
   };
   console.log(
     `\ncrawl complete: ${totals.ok} ok / ${totals.errors} error / ${totals.skipped} skipped, ` +
-      `${totals.fresh} fresh records, ${totals.opportunities} total in snapshot`,
+      `${totals.fresh} fresh records, ${totals.opportunities} opportunities + ${totals.awards} awards in snapshot`,
   );
 
   if (dryRun) {
