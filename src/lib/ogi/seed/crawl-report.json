@@ -1,0 +1,218 @@
+{
+  "ranAt": 1789977739,
+  "sources": [
+    {
+      "id": "nlnet",
+      "status": "ok",
+      "items": 18,
+      "new": 0,
+      "errors": [],
+      "durationMs": 17997
+    },
+    {
+      "id": "sovereign-tech",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: html, sitemap"
+    },
+    {
+      "id": "open-philanthropy",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: html"
+    },
+    {
+      "id": "grants-gov",
+      "status": "ok",
+      "items": 500,
+      "new": 0,
+      "errors": [],
+      "durationMs": 5962
+    },
+    {
+      "id": "nsf",
+      "status": "ok",
+      "items": 0,
+      "new": 0,
+      "errors": [
+        "https://www.nsf.gov/rss/rss_www_funding_upcoming.xml: HTTP 403 Forbidden for https://www.nsf.gov/rss/rss_www_funding_upcoming.xml"
+      ],
+      "durationMs": 2548
+    },
+    {
+      "id": "nih",
+      "status": "ok",
+      "items": 0,
+      "new": 0,
+      "errors": [
+        "https://grants.nih.gov/news/nih-guide-rss.xml: HTTP 403 Forbidden for https://grants.nih.gov/news/nih-guide-rss.xml"
+      ],
+      "durationMs": 702
+    },
+    {
+      "id": "eu-horizon",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: api"
+    },
+    {
+      "id": "gitcoin",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: graphql"
+    },
+    {
+      "id": "ethereum-esp",
+      "status": "ok",
+      "items": 31,
+      "new": 0,
+      "errors": [],
+      "durationMs": 3180
+    },
+    {
+      "id": "opensats",
+      "status": "ok",
+      "items": 8,
+      "new": 0,
+      "errors": [],
+      "durationMs": 358
+    },
+    {
+      "id": "mozilla",
+      "status": "ok",
+      "items": 2,
+      "new": 0,
+      "errors": [],
+      "durationMs": 1763
+    },
+    {
+      "id": "linux-foundation",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: html"
+    },
+    {
+      "id": "github-sponsors-orgs",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: graphql"
+    },
+    {
+      "id": "grantmakers-io",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: html"
+    },
+    {
+      "id": "aisafety-funding",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: html"
+    },
+    {
+      "id": "prototype-fund",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: html"
+    },
+    {
+      "id": "ukri",
+      "status": "ok",
+      "items": 20,
+      "new": 0,
+      "errors": [],
+      "durationMs": 1691
+    },
+    {
+      "id": "wellcome",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 1,
+      "reason": "no supported adapter for endpoint kinds: html"
+    },
+    {
+      "id": "darpa",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: html"
+    },
+    {
+      "id": "nostr-announcements",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: api"
+    },
+    {
+      "id": "community",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no endpoints declared"
+    },
+    {
+      "id": "arcadia-fund",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: html"
+    },
+    {
+      "id": "ford-foundation",
+      "status": "skipped",
+      "items": 0,
+      "new": 0,
+      "errors": [],
+      "durationMs": 0,
+      "reason": "no supported adapter for endpoint kinds: html"
+    },
+    {
+      "id": "knight-foundation",
+      "status": "ok",
+      "items": 0,
+      "new": 0,
+      "errors": [
+        "https://knightfoundation.org/feed/: HTTP 403 Forbidden for https://knightfoundation.org/feed/"
+      ],
+      "durationMs": 1246
+    }
+  ]
+}

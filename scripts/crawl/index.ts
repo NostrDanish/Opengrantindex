@@ -24,7 +24,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { canonicalizeUrl, detectDeadline, shortHash, slugify } from '../../src/lib/ogi/normalize';
-import type { GeneratedOpportunity, GeneratedSnapshot, CrawlReport, SourceReport } from '../../src/lib/ogi/seed/opportunities';
+import type { GeneratedOpportunity, GeneratedSnapshot, CrawlReport } from '../../src/lib/ogi/seed/opportunities';
 import { SEED_SOURCES } from '../../src/lib/ogi/seed/sources';
 import type { SeedSource } from '../../src/lib/ogi/seed/sources';
 import type { FundingType, OpportunityStatus } from '../../src/lib/ogi/types';

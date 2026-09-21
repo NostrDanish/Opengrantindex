@@ -17,6 +17,7 @@ interface GrantsGovHit {
   id?: string | number;
   number?: string;
   oppTitle?: string;
+  title?: string;
   agency?: string;
   agencyCode?: string;
   openDate?: string;
@@ -46,7 +47,7 @@ function toAmount(value: string | number | undefined): number | undefined {
 }
 
 function hitToCandidate(hit: GrantsGovHit): RawCandidate | null {
-  const title = (hit.oppTitle ?? '').trim();
+  const title = (hit.oppTitle ?? hit.title ?? '').trim();
   const id = hit.id !== undefined ? String(hit.id) : undefined;
   if (!title || !id) return null;
 

@@ -33,7 +33,7 @@ export const SEED_SOURCES: SeedSource[] = [
       'Dutch foundation funding free and open source technology for the open internet, largely via the EU Next Generation Internet programme. Publishes calls and grantee lists as structured HTML plus an RSS news feed.',
     adapter: 'rss+html',
     endpoints: [
-      { url: 'https://nlnet.nl/news/rss.xml', kind: 'rss' },
+      { url: 'https://nlnet.nl/feed.atom', kind: 'rss' },
       { url: 'https://nlnet.nl/funding/', kind: 'html' },
     ],
     schedule: '0 6 * * *',
@@ -186,7 +186,7 @@ export const SEED_SOURCES: SeedSource[] = [
     adapter: 'html+nostr',
     endpoints: [
       { url: 'https://opensats.org/blog', kind: 'html' },
-      { url: 'https://opensats.org/rss.xml', kind: 'rss' },
+      { url: 'https://opensats.org/feed.xml', kind: 'rss' },
     ],
     schedule: '0 12 * * *',
     status: 'healthy',

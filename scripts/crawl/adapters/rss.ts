@@ -8,12 +8,18 @@
 
 import { XMLParser } from 'fast-xml-parser';
 
-import { detectAmount, detectDeadline } from '../../src/lib/ogi/normalize';
+import { detectAmount, detectDeadline } from '../../../src/lib/ogi/normalize';
 import { fetchText } from '../net';
 import type { AdapterResult, RawCandidate } from '../types';
 
 /** Only items matching this gate are kept — everything else is blog noise. */
 const FUNDING_KEYWORDS = /grant|fund|fellowship|bounty|rfp|call for|prize|hackathon|award|apply/i;
+
+/**
+ * Items older than this without a detectable future deadline are archive
+ * noise (past announcements), not live opportunities.
+ */
+const MAX_ITEM_AGE_S = 180 * 86_400;
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -114,6 +120,14 @@ function extractItems(doc: Record<string, unknown>): FeedItem[] {
   return items.filter((i) => i.title && i.link);
 }
 
+function resolveUrl(link: string, base: string): string {
+  try {
+    return new URL(link, base).toString();
+  } catch {
+    return link;
+  }
+}
+
 /** Crawl every RSS endpoint of a source and return funding-looking candidates. */
 export async function crawlRss(endpoints: { url: string }[]): Promise<AdapterResult> {
   const candidates: RawCandidate[] = [];
@@ -141,12 +155,20 @@ export async function crawlRss(endpoints: { url: string }[]): Promise<AdapterRes
       const haystack = `${item.title}\n${description}`;
       if (!FUNDING_KEYWORDS.test(haystack)) continue;
 
+      const deadline = detectDeadline(haystack);
+      // Recency guard: keep live items (future deadline) or recent posts;
+      // drop stale archive entries that would otherwise look open forever.
+      const nowSec = Math.floor(Date.now() / 1000);
+      const hasFutureDeadline = deadline !== undefined && deadline > nowSec;
+      const isRecent = item.publishedAt !== undefined && nowSec - item.publishedAt <= MAX_ITEM_AGE_S;
+      if (!hasFutureDeadline && !isRecent) continue;
+
       candidates.push({
         title: item.title.trim(),
-        url: item.link.trim(),
+        url: resolveUrl(item.link.trim(), endpoint.url),
         description: description || item.title.trim(),
         publishedAt: item.publishedAt,
-        deadline: detectDeadline(haystack),
+        deadline,
         amount: detectAmount(haystack),
       });
     }
