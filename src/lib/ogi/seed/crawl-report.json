@@ -1,5 +1,5 @@
 {
-  "ranAt": 1789977739,
+  "ranAt": 1789978460,
   "sources": [
     {
       "id": "nlnet",
@@ -7,7 +7,7 @@
       "items": 18,
       "new": 0,
       "errors": [],
-      "durationMs": 17997
+      "durationMs": 8167
     },
     {
       "id": "sovereign-tech",
@@ -33,7 +33,7 @@
       "items": 500,
       "new": 0,
       "errors": [],
-      "durationMs": 5962
+      "durationMs": 3061
     },
     {
       "id": "nsf",
@@ -43,7 +43,7 @@
       "errors": [
         "https://www.nsf.gov/rss/rss_www_funding_upcoming.xml: HTTP 403 Forbidden for https://www.nsf.gov/rss/rss_www_funding_upcoming.xml"
       ],
-      "durationMs": 2548
+      "durationMs": 1539
     },
     {
       "id": "nih",
@@ -53,7 +53,7 @@
       "errors": [
         "https://grants.nih.gov/news/nih-guide-rss.xml: HTTP 403 Forbidden for https://grants.nih.gov/news/nih-guide-rss.xml"
       ],
-      "durationMs": 702
+      "durationMs": 902
     },
     {
       "id": "eu-horizon",
@@ -61,7 +61,7 @@
       "items": 0,
       "new": 0,
       "errors": [],
-      "durationMs": 0,
+      "durationMs": 1,
       "reason": "no supported adapter for endpoint kinds: api"
     },
     {
@@ -79,7 +79,7 @@
       "items": 31,
       "new": 0,
       "errors": [],
-      "durationMs": 3180
+      "durationMs": 875
     },
     {
       "id": "opensats",
@@ -87,7 +87,7 @@
       "items": 8,
       "new": 0,
       "errors": [],
-      "durationMs": 358
+      "durationMs": 309
     },
     {
       "id": "mozilla",
@@ -95,7 +95,7 @@
       "items": 2,
       "new": 0,
       "errors": [],
-      "durationMs": 1763
+      "durationMs": 1074
     },
     {
       "id": "linux-foundation",
@@ -103,7 +103,7 @@
       "items": 0,
       "new": 0,
       "errors": [],
-      "durationMs": 0,
+      "durationMs": 1,
       "reason": "no supported adapter for endpoint kinds: html"
     },
     {
@@ -148,7 +148,7 @@
       "items": 20,
       "new": 0,
       "errors": [],
-      "durationMs": 1691
+      "durationMs": 1246
     },
     {
       "id": "wellcome",
@@ -156,7 +156,7 @@
       "items": 0,
       "new": 0,
       "errors": [],
-      "durationMs": 1,
+      "durationMs": 0,
       "reason": "no supported adapter for endpoint kinds: html"
     },
     {
@@ -212,7 +212,7 @@
       "errors": [
         "https://knightfoundation.org/feed/: HTTP 403 Forbidden for https://knightfoundation.org/feed/"
       ],
-      "durationMs": 1246
+      "durationMs": 686
     }
   ]
 }

@@ -111,6 +111,23 @@ The site keeps itself fresh without any manual curation:
 Useful flags: `npm run crawl -- --source=<id>` crawls one source, `--dry-run` prints without
 writing, `--publish` forces relay publishing.
 
+### SIP-01
+
+The crawler doubles as a [SIP-01](https://github.com/NostrDanish/SIP-01) indexer node. In publish
+mode, each crawled opportunity produces three things:
+
+1. **kind 35231** — the OGI opportunity record (the corpus itself),
+2. **kind 39697** — a SIP-01 web-index observation of the opportunity's page, with identity
+   derived by the vendored protocol core (`scripts/crawl/lib/sip01-webIndex.ts`, copied verbatim
+   from `sip-01-core/src/protocol/webIndex.ts`; SIP-01 §13 byte-compatibility is enforced by
+   `scripts/crawl/lib/sip01-webIndex.test.ts`). SIP-01's `normalizeIndexUrl` intentionally differs
+   from OGI's `canonicalizeUrl` — the two identities are computed independently and never mixed,
+3. **kind 16919** — one replaceable heartbeat per run (`source: ogi-crawl/1`), reporting
+   `pagesIndexed`/`published` stats so the SIP-01 network can see the node is alive.
+
+Per SIP-01 §14, `OGI_BOT_NSEC` must be a **dedicated bot keypair** — never a personal key; the
+pubkey is the indexer identity and rotating the key simply creates a new indexer.
+
 ## Project layout
 
 ```
