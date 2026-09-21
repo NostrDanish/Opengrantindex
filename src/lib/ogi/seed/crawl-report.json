@@ -1,5 +1,5 @@
 {
-  "ranAt": 1789983133,
+  "ranAt": 1790025923,
   "sources": [
     {
       "id": "nlnet",
@@ -7,7 +7,7 @@
       "items": 18,
       "new": 0,
       "errors": [],
-      "durationMs": 2650
+      "durationMs": 1478
     },
     {
       "id": "sovereign-tech",
@@ -33,17 +33,15 @@
       "items": 500,
       "new": 0,
       "errors": [],
-      "durationMs": 1751
+      "durationMs": 724
     },
     {
       "id": "nsf",
       "status": "ok",
-      "items": 0,
-      "new": 0,
-      "errors": [
-        "https://www.nsf.gov/rss/rss_www_funding_upcoming.xml: HTTP 403 Forbidden for https://www.nsf.gov/rss/rss_www_funding_upcoming.xml"
-      ],
-      "durationMs": 3285
+      "items": 13,
+      "new": 13,
+      "errors": [],
+      "durationMs": 295
     },
     {
       "id": "nih",
@@ -51,17 +49,17 @@
       "items": 0,
       "new": 0,
       "errors": [
-        "https://grants.nih.gov/news/nih-guide-rss.xml: HTTP 403 Forbidden for https://grants.nih.gov/news/nih-guide-rss.xml"
+        "https://grants.nih.gov/news/nih-guide-rss.xml: HTTP 404 Not Found for https://grants.nih.gov/news/nih-guide-rss.xml"
       ],
-      "durationMs": 710
+      "durationMs": 359
     },
     {
       "id": "eu-horizon",
       "status": "ok",
-      "items": 196,
+      "items": 180,
       "new": 0,
       "errors": [],
-      "durationMs": 51944
+      "durationMs": 9306
     },
     {
       "id": "gitcoin",
@@ -78,7 +76,7 @@
       "items": 31,
       "new": 0,
       "errors": [],
-      "durationMs": 1171
+      "durationMs": 125
     },
     {
       "id": "opensats",
@@ -86,7 +84,7 @@
       "items": 8,
       "new": 0,
       "errors": [],
-      "durationMs": 313
+      "durationMs": 103
     },
     {
       "id": "mozilla",
@@ -94,7 +92,7 @@
       "items": 2,
       "new": 0,
       "errors": [],
-      "durationMs": 2702
+      "durationMs": 344
     },
     {
       "id": "linux-foundation",
@@ -117,18 +115,18 @@
     {
       "id": "github-bounties",
       "status": "ok",
-      "items": 99,
-      "new": 0,
+      "items": 95,
+      "new": 15,
       "errors": [],
-      "durationMs": 1995
+      "durationMs": 1354
     },
     {
       "id": "manifund",
       "status": "ok",
-      "items": 97,
-      "new": 0,
+      "items": 96,
+      "new": 3,
       "errors": [],
-      "durationMs": 3835
+      "durationMs": 1267
     },
     {
       "id": "nih-reporter",
@@ -136,7 +134,7 @@
       "items": 200,
       "new": 0,
       "errors": [],
-      "durationMs": 36485
+      "durationMs": 1021
     },
     {
       "id": "grantmakers-io",
@@ -169,9 +167,9 @@
       "id": "ukri",
       "status": "ok",
       "items": 20,
-      "new": 0,
+      "new": 1,
       "errors": [],
-      "durationMs": 1353
+      "durationMs": 951
     },
     {
       "id": "wellcome",
@@ -232,10 +230,8 @@
       "status": "ok",
       "items": 0,
       "new": 0,
-      "errors": [
-        "https://knightfoundation.org/feed/: HTTP 403 Forbidden for https://knightfoundation.org/feed/"
-      ],
-      "durationMs": 885
+      "errors": [],
+      "durationMs": 64
     }
   ]
 }
