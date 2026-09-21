@@ -73,10 +73,21 @@ export function useSavedOpportunities() {
     [saved, setLocal, user, mutation],
   );
 
+  /**
+   * Empty the whole set atomically: one local write and at most one relay
+   * publish, instead of N racing toggle() mutations (last-write-wins would
+   * leave all but one item behind).
+   */
+  const clearAll = useCallback(() => {
+    setLocal([]);
+    if (user) mutation.mutate([]);
+  }, [setLocal, user, mutation]);
+
   return {
     saved,
     isSaved: useCallback((address: string) => saved.has(address), [saved]),
     toggle,
+    clearAll,
     count: saved.size,
     isSyncing: remote.isLoading || mutation.isPending,
   };

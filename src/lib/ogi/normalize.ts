@@ -55,9 +55,16 @@ export function canonicalizeUrl(raw: string | undefined | null): string | undefi
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return undefined;
   if (!parsed.hostname.includes('.')) return undefined;
 
+  // Default ports are checked against the *original* protocol, before we
+  // force https. A non-default port is part of the origin's identity and
+  // stripping it would merge distinct sites.
+  const isDefaultPort =
+    (parsed.protocol === 'http:' && parsed.port === '80') ||
+    (parsed.protocol === 'https:' && parsed.port === '443');
+
   parsed.protocol = 'https:';
   parsed.hash = '';
-  parsed.port = '';
+  if (isDefaultPort) parsed.port = '';
   parsed.username = '';
   parsed.password = '';
   parsed.hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');

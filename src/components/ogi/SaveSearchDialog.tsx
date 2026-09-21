@@ -22,7 +22,7 @@ import type { OgiSearchState } from '@/hooks/useOgiSearch';
 import { useToast } from '@/hooks/useToast';
 import { OGI_KINDS } from '@/lib/ogi/kinds';
 import { slugify } from '@/lib/ogi/normalize';
-import { filtersToParams } from '@/lib/ogi/search';
+import { buildRssFeed, downloadText } from '@/lib/ogi/export';
 
 /**
  * Publishes a kind 30441 saved search so alerts and saved queries roam with the
@@ -97,7 +97,22 @@ export function SaveSearchDialog({
     },
   });
 
-  const feedUrl = `${window.location.origin}/feed.xml?${filtersToParams(search.filters).toString()}`;
+  // The static site has no server-side /feed.xml — generate the feed locally
+  // from the current result set instead of advertising a URL that 404s.
+  const downloadRss = () => {
+    downloadText(
+      'opengrantindex-search.xml',
+      'application/rss+xml',
+      buildRssFeed(
+        search.results.map((r) => r.opportunity),
+        {
+          title: search.filters.q ? `OpenGrantIndex — ${search.filters.q}` : 'OpenGrantIndex search',
+          origin: window.location.origin,
+          selfUrl: window.location.href,
+        },
+      ),
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -114,7 +129,7 @@ export function SaveSearchDialog({
         {!user ? (
           <div className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">
-              Log in to publish a saved search. You can still copy the RSS feed below without an
+              Log in to publish a saved search. You can still download the RSS feed below without an
               account.
             </p>
             <LoginArea className="w-full" />
@@ -162,7 +177,14 @@ export function SaveSearchDialog({
             <Rss className="size-3.5" aria-hidden />
             RSS feed for this search
           </p>
-          <code className="block break-all font-mono text-xs text-muted-foreground">{feedUrl}</code>
+          <p className="mb-2.5 text-xs text-muted-foreground">
+            Generated locally from the current results — the static site has no server-side feed
+            endpoint.
+          </p>
+          <Button variant="outline" size="sm" onClick={downloadRss}>
+            <Rss className="mr-1.5 size-4" />
+            Download RSS feed
+          </Button>
         </div>
 
         <DialogFooter>

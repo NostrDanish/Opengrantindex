@@ -22,7 +22,10 @@ import Trust from "./pages/Trust";
 
 export function AppRouter() {
   return (
-    <BrowserRouter>
+    // GitHub Pages serves project sites under /<repo>/; BASE_URL carries the
+    // vite base (set from VITE_BASE in the deploy workflow) so routes resolve
+    // under the subpath.
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />

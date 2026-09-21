@@ -24,7 +24,7 @@ export default function SavedPage() {
 
   const { user } = useCurrentUser();
   const { index } = useOgiIndex();
-  const { saved, toggle } = useSavedOpportunities();
+  const { saved, clearAll } = useSavedOpportunities();
   const { data: searches = [], isLoading: searchesLoading } = useSavedSearches();
 
   const opportunities = useMemo(() => {
@@ -50,6 +50,14 @@ export default function SavedPage() {
             ? 'Your saved opportunities are published as a NIP-51 bookmark set and your searches as kind 30441 events, so both follow your identity to any client.'
             : 'Saved items are stored in this browser only. Log in and they publish to your relays, so they follow you everywhere.'}
         </p>
+        {user && (
+          // TODO: encrypt the saved set (NIP-44 payload) once private lists land — for now
+          // kind 30003 bookmarks are plaintext and visible to anyone reading your relays.
+          <p className="text-sm text-muted-foreground">
+            Note: your saved list is currently <strong>public</strong> — relays store it as a
+            plaintext bookmark set. Encrypted private lists are a later milestone.
+          </p>
+        )}
       </header>
 
       {!user && (
@@ -80,9 +88,7 @@ export default function SavedPage() {
               variant="ghost"
               size="sm"
               className="text-muted-foreground hover:text-destructive"
-              onClick={() => {
-                for (const o of opportunities) toggle(o.address);
-              }}
+              onClick={clearAll}
             >
               <Trash2 className="mr-1.5 size-4" />
               Clear all

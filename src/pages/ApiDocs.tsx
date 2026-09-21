@@ -294,6 +294,13 @@ const funders = await ogi.graph({
             Any search is also a feed. Every filter that works in the UI works in the feed URL, so a
             saved search can drive a reader, a cron job or a calendar without touching an API.
           </P>
+          <Callout tone="info" title="Requires a server deployment">
+            <p>
+              The URLs below are served by the optional API mirror, not by this static site — on
+              GitHub Pages they would 404. Use the client-side generators further down (or the export
+              menu on the search page) when running the static build.
+            </p>
+          </Callout>
           <Code language="urls">{`# RSS / Atom for any query
 /feed.xml?topic=ai+safety&status=open&sort=deadline
 /feed.xml?q=nostr+bounties&remote=1
@@ -359,6 +366,13 @@ const funders = await ogi.graph({
             <strong>{index.funders.length.toLocaleString()} funders</strong> and{' '}
             <strong>{index.sources.length.toLocaleString()} sources</strong> in this client's view.
           </P>
+          <Callout tone="info" title="Requires a server deployment">
+            <p>
+              The .jsonl.gz export URLs are served by the optional API mirror; this static build can
+              only produce the uncompressed downloads below. Relay sync (the nak example) works
+              against any relay today.
+            </p>
+          </Callout>
           <Code language="bash">{`# Normalized records
 curl -L https://opengrantindex.org/export/opportunities.jsonl.gz | gunzip
 curl -L https://opengrantindex.org/export/awards.jsonl.gz | gunzip

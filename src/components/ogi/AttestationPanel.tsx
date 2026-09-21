@@ -58,10 +58,12 @@ export function AttestationPanel({ opportunity }: { opportunity: MergedOpportuni
   const submit = async () => {
     if (!verdict) return;
     try {
-      const deadline =
+      const parsed =
         verdict === 'deadline_changed' && newDeadline
           ? Math.floor(new Date(`${newDeadline}T23:59:00Z`).getTime() / 1000)
           : undefined;
+      // A bypassed date input yields NaN — refuse rather than publish it.
+      const deadline = parsed !== undefined && Number.isFinite(parsed) ? parsed : undefined;
 
       if (verdict === 'deadline_changed' && !deadline) {
         toast({ title: 'Please provide the corrected deadline', variant: 'destructive' });

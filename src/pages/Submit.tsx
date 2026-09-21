@@ -138,6 +138,23 @@ export default function SubmitPage() {
       return;
     }
 
+    // A bypassed date input can yield NaN — never publish a ['deadline','NaN'] tag.
+    const deadlineTs = deadline ? Math.floor(new Date(`${deadline}T23:59:00Z`).getTime() / 1000) : undefined;
+    if (deadlineTs !== undefined && !Number.isFinite(deadlineTs)) {
+      toast({ title: 'The deadline is not a valid date', variant: 'destructive' });
+      return;
+    }
+    const min = amountMin ? Number(amountMin) : undefined;
+    const max = amountMax ? Number(amountMax) : undefined;
+    if ((min !== undefined && !Number.isFinite(min)) || (max !== undefined && !Number.isFinite(max))) {
+      toast({ title: 'Amounts must be numbers', variant: 'destructive' });
+      return;
+    }
+    if (min !== undefined && max !== undefined && min > max) {
+      toast({ title: 'Minimum amount cannot exceed the maximum', variant: 'destructive' });
+      return;
+    }
+
     try {
       const result = await submit({
         title,
@@ -146,9 +163,9 @@ export default function SubmitPage() {
         url: canonical,
         fundingType,
         status,
-        deadline: deadline ? Math.floor(new Date(`${deadline}T23:59:00Z`).getTime() / 1000) : undefined,
-        amountMin: amountMin ? Number(amountMin) : undefined,
-        amountMax: amountMax ? Number(amountMax) : undefined,
+        deadline: deadlineTs,
+        amountMin: min,
+        amountMax: max,
         currency,
         topics,
         countries,

@@ -45,6 +45,15 @@ function tagNumber(event: NostrEvent, name: string): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+/**
+ * Clamp a publisher-claimed timestamp to the present. Future-dated
+ * `last_checked`/`published_at` are always a lie (or a broken clock) and would
+ * otherwise buy undeserved freshness in trust scoring and merge ranking.
+ */
+function clampToNow(n: number | undefined, now: number): number | undefined {
+  return n !== undefined && n > now ? now : n;
+}
+
 export function addressOf(event: NostrEvent): string {
   const d = tagValue(event, 'd') ?? '';
   return `${event.kind}:${event.pubkey}:${d}`;
@@ -110,6 +119,7 @@ function oneOf<T extends string>(value: string | undefined, allowed: readonly T[
 export function parseOpportunity(event: NostrEvent): Opportunity | null {
   if (event.kind !== OGI_KINDS.OPPORTUNITY) return null;
 
+  const now = Math.floor(Date.now() / 1000);
   const identifier = tagValue(event, 'd');
   const title = tagValue(event, 'title');
   if (!identifier || !title) return null;
@@ -155,8 +165,8 @@ export function parseOpportunity(event: NostrEvent): Opportunity | null {
     funderPubkeys: tagValues(event, 'p'),
     sourceId: identifier.split(':')[0] || 'community',
     sourceAddress: tagValues(event, 'a').find((a) => a.startsWith(`${OGI_KINDS.SOURCE}:`)),
-    lastChecked: tagNumber(event, 'last_checked'),
-    publishedAt: tagNumber(event, 'published_at') ?? event.created_at,
+    lastChecked: clampToNow(tagNumber(event, 'last_checked'), now),
+    publishedAt: clampToNow(tagNumber(event, 'published_at'), now) ?? event.created_at,
     contentHash: tagValue(event, 'content_hash'),
     extraction: extractedBy
       ? {

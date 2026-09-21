@@ -71,19 +71,22 @@ const COUNTRY_NAME_TO_CODE = (() => {
   for (const [code, { name }] of Object.entries(COUNTRIES)) {
     map.set(name.toLowerCase(), code);
   }
-  // common aliases
-  map.set('usa', 'US');
-  map.set('us', 'US');
-  map.set('america', 'US');
-  map.set('united states', 'US');
-  map.set('uk', 'GB');
-  map.set('britain', 'GB');
-  map.set('united kingdom', 'GB');
-  map.set('great britain', 'GB');
-  map.set('holland', 'NL');
-  map.set('south korea', 'KR');
   return map;
 })();
+
+/** Short/common aliases — resolved before full names (they are short by nature). */
+const COUNTRY_ALIAS_TO_CODE = new Map<string, string>([
+  ['usa', 'US'],
+  ['us', 'US'],
+  ['america', 'US'],
+  ['united states', 'US'],
+  ['uk', 'GB'],
+  ['britain', 'GB'],
+  ['united kingdom', 'GB'],
+  ['great britain', 'GB'],
+  ['holland', 'NL'],
+  ['south korea', 'KR'],
+]);
 
 const EU_COUNTRIES = [
   'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV',
@@ -204,7 +207,17 @@ export function parseQuery(input: string): ParsedQuery {
     residual = residual.replace(/\b(remote|online|virtual)\b/g, ' ');
   }
 
-  // Countries
+  // Countries: short aliases first (they fail the length floor below), then
+  // full country names, longest first so "south africa" wins over "africa".
+  for (const [name, code] of [...COUNTRY_ALIAS_TO_CODE].sort((a, b) => b[0].length - a[0].length)) {
+    if (residual.includes(` ${name} `)) {
+      if (!result.countries.includes(code)) {
+        result.countries.push(code);
+        result.interpretations.push(`country: ${COUNTRIES[code]?.name ?? code}`);
+      }
+      consume(` ${name} `);
+    }
+  }
   for (const [name, code] of [...COUNTRY_NAME_TO_CODE].sort((a, b) => b[0].length - a[0].length)) {
     if (name.length < 4) continue;
     if (residual.includes(` ${name} `)) {
