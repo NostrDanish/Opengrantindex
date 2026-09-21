@@ -89,6 +89,28 @@ npm run build
 The app ships with a bundled corpus snapshot so it is fully functional on first paint, before any
 relay has answered. Live signed records from relays always take precedence over the snapshot.
 
+## Automation
+
+The site keeps itself fresh without any manual curation:
+
+- **`scripts/crawl/`** — a TypeScript crawler (`npm run crawl`) that polls every enabled source
+  declared in `src/lib/ogi/seed/sources.ts`. RSS/Atom feeds and the Grants.gov Search2 API are
+  supported today; sources whose endpoints need html/sitemap/graphql/pdf adapters are skipped and
+  recorded as such. Results are normalized with the exact identity rules of the frontend
+  (`canonicalizeUrl` is the primary key), merged with the previous snapshot — records that vanish
+  from a source for over 30 days, or whose deadline passes, are marked `closed` — and written to
+  `src/lib/ogi/seed/generated.json`, `generated.ts` and `crawl-report.json`.
+- **`.github/workflows/crawl.yml`** — a cron workflow (every 6 hours, plus manual dispatch) that
+  runs the crawler and commits the refreshed snapshot. The push triggers the deploy workflow, so
+  the site auto-updates.
+- **Relay publishing** — when the repository secret `OGI_BOT_NSEC` contains an `nsec` key for the
+  crawler bot, the run also publishes signed kind 35231 events (same tag layout as the snapshot)
+  to the app relays. Without the secret the crawler runs in snapshot-only mode and the workflow
+  still succeeds.
+
+Useful flags: `npm run crawl -- --source=<id>` crawls one source, `--dry-run` prints without
+writing, `--publish` forces relay publishing.
+
 ## Project layout
 
 ```

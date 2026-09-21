@@ -17,6 +17,11 @@ export interface SeedSource {
   status: 'healthy' | 'degraded' | 'failing' | 'planned';
   topics: string[];
   countries: string[];
+  /**
+   * Default funder attribution for records discovered at this source.
+   * The id references a SEED_FUNDERS entry when one exists.
+   */
+  funder?: { name: string; id: string };
 }
 
 export const SEED_SOURCES: SeedSource[] = [
@@ -36,6 +41,7 @@ export const SEED_SOURCES: SeedSource[] = [
     status: 'healthy',
     topics: ['open source', 'privacy', 'internet', 'security'],
     countries: ['NL', 'GLOBAL'],
+    funder: { name: 'NLnet Foundation', id: 'nlnet-foundation' },
   },
   {
     id: 'sovereign-tech',
@@ -85,6 +91,7 @@ export const SEED_SOURCES: SeedSource[] = [
     status: 'healthy',
     topics: ['research', 'health', 'education', 'science', 'infrastructure'],
     countries: ['US'],
+    funder: { name: 'US Federal Government (Grants.gov)', id: 'us-federal-government' },
   },
   {
     id: 'nsf',
@@ -102,6 +109,7 @@ export const SEED_SOURCES: SeedSource[] = [
     status: 'healthy',
     topics: ['science', 'research', 'education', 'ai'],
     countries: ['US'],
+    funder: { name: 'US National Science Foundation', id: 'nsf' },
   },
   {
     id: 'nih',
@@ -119,6 +127,7 @@ export const SEED_SOURCES: SeedSource[] = [
     status: 'healthy',
     topics: ['health', 'biomedical', 'research'],
     countries: ['US'],
+    funder: { name: 'US National Institutes of Health', id: 'nih' },
   },
   {
     id: 'eu-horizon',
@@ -166,6 +175,7 @@ export const SEED_SOURCES: SeedSource[] = [
     status: 'healthy',
     topics: ['crypto', 'open source', 'privacy', 'research'],
     countries: ['GLOBAL'],
+    funder: { name: 'Ethereum Foundation', id: 'ethereum-foundation' },
   },
   {
     id: 'opensats',
@@ -182,6 +192,7 @@ export const SEED_SOURCES: SeedSource[] = [
     status: 'healthy',
     topics: ['bitcoin', 'nostr', 'open source', 'privacy'],
     countries: ['GLOBAL'],
+    funder: { name: 'OpenSats', id: 'opensats' },
   },
   {
     id: 'mozilla',
@@ -198,6 +209,7 @@ export const SEED_SOURCES: SeedSource[] = [
     status: 'healthy',
     topics: ['ai', 'privacy', 'internet', 'open source'],
     countries: ['GLOBAL'],
+    funder: { name: 'Mozilla Foundation', id: 'mozilla-foundation' },
   },
   {
     id: 'linux-foundation',
@@ -379,6 +391,7 @@ export const SEED_SOURCES: SeedSource[] = [
     status: 'healthy',
     topics: ['journalism', 'arts', 'education'],
     countries: ['US'],
+    funder: { name: 'John S. and James L. Knight Foundation', id: 'knight-foundation' },
   },
 ];
 

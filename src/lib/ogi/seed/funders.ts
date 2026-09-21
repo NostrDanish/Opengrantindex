@@ -222,6 +222,29 @@ export const SEED_FUNDERS: SeedFunder[] = [
     topics: ['human rights', 'bitcoin', 'privacy', 'censorship resistance'],
     countries: ['US'],
   },
+  {
+    id: 'us-federal-government',
+    name: 'US Federal Government (Grants.gov)',
+    about: 'All US federal grantmaking agencies, indexed through the Grants.gov Search2 API.',
+    description:
+      'Grants.gov is the single point of publication for every US federal discretionary funding opportunity. Records attributed to this funder were discovered via the public Search2 API; the awarding agency is named in each record.',
+    website: 'https://www.grants.gov/',
+    funderType: 'government',
+    topics: ['research', 'health', 'education', 'science', 'infrastructure'],
+    countries: ['US'],
+  },
+  {
+    id: 'nih',
+    name: 'US National Institutes of Health',
+    about: 'The largest public funder of biomedical research in the world.',
+    description:
+      'NIH publishes notices of funding opportunity through the NIH Guide for Grants and Contracts, with strict recurring deadline cycles that make it ideal for automatic deadline projection.',
+    website: 'https://grants.nih.gov/',
+    funderType: 'government',
+    topics: ['health', 'biomedical', 'research'],
+    countries: ['US'],
+    assets: { amount: 47000000000, currency: 'USD', year: '2024' },
+  },
 ];
 
 export const SEED_FUNDER_MAP = new Map(SEED_FUNDERS.map((f) => [f.id, f]));

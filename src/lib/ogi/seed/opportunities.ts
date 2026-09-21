@@ -34,6 +34,63 @@ export interface SeedOpportunity {
   extraction?: { pipeline: string; model?: string; confidence?: number };
 }
 
+/**
+ * An opportunity produced by the automated crawler (scripts/crawl).
+ *
+ * Mirrors SeedOpportunity, but with absolute unix timestamps instead of
+ * relative day offsets: crawled data is refreshed by the cron workflow, so it
+ * does not need the "never rots" relative-deadline trick. Written to
+ * `generated.json` / `generated.ts` — both are generated artifacts.
+ */
+export interface GeneratedOpportunity {
+  sourceId: string;
+  title: string;
+  summary: string;
+  description: string;
+  url: string;
+  applyUrl?: string;
+  fundingType: FundingType;
+  status: OpportunityStatus;
+  /** Absolute unix seconds. */
+  deadline?: number;
+  opensAt?: number;
+  amount?: { min?: number; max?: number; currency: string };
+  topics: string[];
+  countries: string[];
+  remote?: boolean;
+  eligibility: string;
+  funder: { name: string; id: string };
+  /** Unix seconds: when the crawler last saw this record at the source. */
+  lastChecked: number;
+  publishedAt?: number;
+  contentHash: string;
+  extraction?: { pipeline: string; model?: string; confidence?: number };
+}
+
+/** The crawler output snapshot bundled with the frontend. */
+export interface GeneratedSnapshot {
+  generatedAt: number;
+  opportunities: GeneratedOpportunity[];
+}
+
+/** Per-source outcome of one crawler run. */
+export interface SourceReport {
+  id: string;
+  status: 'ok' | 'error' | 'skipped';
+  items: number;
+  new: number;
+  errors: string[];
+  durationMs: number;
+  /** Present when status is 'skipped'. */
+  reason?: string;
+}
+
+/** Aggregate crawler report written to `crawl-report.json`. */
+export interface CrawlReport {
+  ranAt: number;
+  sources: SourceReport[];
+}
+
 export const SEED_OPPORTUNITIES: SeedOpportunity[] = [
   {
     sourceId: 'nlnet',

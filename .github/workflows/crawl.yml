@@ -1,0 +1,58 @@
+name: Crawl sources & refresh snapshot
+
+on:
+  # Every 6 hours, offset from the top of the hour to avoid the cron rush.
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: crawl
+  cancel-in-progress: false
+
+env:
+  OGI_BOT_NSEC: ${{ secrets.OGI_BOT_NSEC }}
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The crawler never fails on individual source errors — those land in
+      # crawl-report.json. Relay publishing only runs when the bot secret is
+      # configured; without it the job refreshes the snapshot only.
+      - name: Crawl sources (snapshot only)
+        if: env.OGI_BOT_NSEC == ''
+        run: npm run crawl
+
+      - name: Crawl sources and publish to relays
+        if: env.OGI_BOT_NSEC != ''
+        run: npm run crawl -- --publish
+
+      - name: Commit refreshed snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/ogi/seed/generated.json src/lib/ogi/seed/generated.ts src/lib/ogi/seed/crawl-report.json
+          if git diff --staged --quiet; then
+            echo "snapshot unchanged — nothing to commit"
+          else
+            git commit -m "chore(crawl): refresh opportunity snapshot"
+            git push
+          fi
