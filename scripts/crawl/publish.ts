@@ -28,7 +28,7 @@ import { buildIndexEvent } from './lib/sip01-webIndex';
 /** SIP-01 crawler heartbeat kind (replaceable). */
 const HEARTBEAT_KIND = 16919;
 /** Indexer software id reported in `source` tags and heartbeat stats. */
-const INDEXER_SOURCE = 'ogi-crawl/1';
+const INDEXER_SOURCE = 'OGI/1';
 
 interface EventTemplate {
   kind: number;

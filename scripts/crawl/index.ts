@@ -123,7 +123,7 @@ function normalizeCandidate(source: SeedSource, c: RawCandidate, now: number): G
     lastChecked: now,
     publishedAt: c.publishedAt,
     contentHash: shortHash(description),
-    extraction: { pipeline: 'ogi-crawler/1', model: 'rules', confidence: 0.7 },
+    extraction: { pipeline: 'OGI/1', model: 'rules', confidence: 0.7 },
   };
 }
 
